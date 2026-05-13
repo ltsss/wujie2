@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>无界茶台工厂直销 - 高端茶桌定制</title>
     <meta name="description" content="无界茶台工厂直销，10万㎡生产基地，专注高端茶桌定制。50-60天精工定制，整板切割无拼接，支持第三方材质鉴定。">
+    <!-- 百度统计 -->
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?43be42a7518f26916888bf1011c92ca1";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -268,7 +278,7 @@
     </section>
 
     <!-- 右上角客服图标 -->
-    <a href="#" class="customer-service-icon" onclick="return openKefu();" title="联系客服">
+    <a href="#" class="customer-service-icon" onclick="return openKefu('右侧悬浮客服');" title="联系客服">
         <img src="images/kefu.png" alt="客服">
     </a>
 
@@ -311,7 +321,7 @@
         <a href="#ourFactory" class="nav-item">工厂</a>
         <a href="#products" class="nav-item active">产品</a>
         <a href="#ourGuarantee" class="nav-item">承诺</a>
-        <a href="#" class="nav-item" onclick="return openKefu();" style="color:#07c160;font-weight:600;">咨询</a>
+        <a href="#" class="nav-item" onclick="return openKefu('导航栏咨询');" style="color:#07c160;font-weight:600;">咨询</a>
     </nav>
 
     <!-- Hero -->
@@ -319,7 +329,7 @@
         <span class="hero-tag">工厂直销 · 源头价格</span>
         <h1>高端茶台工厂直销</h1>
         <p class="hero-desc">10万㎡生产基地直供 · 50-60天精工定制 · 整板切割无拼接</p>
-        <a href="#" class="btn" onclick="return openKefu();">立即咨询</a>
+        <a href="#" class="btn" onclick="return openKefu('Hero立即咨询');">立即咨询</a>
     </section>
 
     <!-- 工厂锚点 -->
@@ -451,7 +461,7 @@
                     <div id="modalSpec"></div>
                 </div>
                 <div class="product-modal-images" id="modalImages"></div>
-                <a href="#" class="product-modal-cta" onclick="closeProductModal(event); openKefu(); return false;">立即咨询</a>
+                <a href="#" class="product-modal-cta" onclick="closeProductModal(event); openKefu('产品弹窗立即咨询'); return false;">立即咨询</a>
             </div>
         </div>
     </div>
@@ -487,12 +497,14 @@
 
     <!-- 底部 -->
     <footer class="footer">
-        <p>© 2026 无界茶台 | 珲春云序智联</p>
+        <p>@無界茶台 版权所有</p>
+        <p>吉ICP备2026002947号-1</p>
+        <p>吉公网安备22240402222521号</p>
     </footer>
     
     <!-- 底部悬浮窗 -->
     <div class="float-bar">
-        <button class="float-bar-btn" onclick="openKefu()">点击咨询，获取专属报价</button>
+        <button class="float-bar-btn" onclick="openKefu('底部悬浮窗')">点击咨询，获取专属报价</button>
     </div>
 
     <script>
@@ -624,8 +636,40 @@
         // 工厂轮播自动播放
         setInterval(() => changeFactorySlide(currentFactorySlide + 1), 4000);
         
+        // 客服点击统计（去重）
+        (function() {
+            const TRACK_API = '/track';
+            const clickedButtons = new Set();
+            
+            window.trackKefuClick = function(buttonName) {
+                const sessionKey = buttonName + '_' + (sessionStorage.getItem('sessionId') || Date.now());
+                if (clickedButtons.has(sessionKey)) return;
+                clickedButtons.add(sessionKey);
+                
+                fetch(TRACK_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        button: buttonName,
+                        url: window.location.href,
+                        timestamp: new Date().toISOString()
+                    })
+                }).catch(e => console.log('Track error:', e));
+            };
+            
+            // 自动设置 sessionId
+            if (!sessionStorage.getItem('sessionId')) {
+                sessionStorage.setItem('sessionId', Date.now().toString());
+            }
+        })();
+        
         // 客服功能
-        function openKefu() {
+        function openKefu(buttonName) {
+            // 统计点击
+            if (window.trackKefuClick && buttonName) {
+                trackKefuClick(buttonName);
+            }
+            
             const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
             if (isMobile) {
